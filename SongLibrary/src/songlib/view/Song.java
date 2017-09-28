@@ -24,12 +24,18 @@ public class Song {
 		return name + " by " + artist;
 	}
 	
+	@Override
+	public int hashCode() {
+		return 31 * 7 + name.length();
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if(o == null || !(o instanceof Song)) {
 			return false;
 		}
 		Song other = (Song)o;
-		return name == other.name && artist == other.artist;
+		return this.name == other.name && this.artist == other.artist;
 	}
 	
 	public void setName(String name) {
