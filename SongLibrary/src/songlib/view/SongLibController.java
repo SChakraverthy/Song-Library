@@ -15,8 +15,9 @@ import org.xml.sax.SAXException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 /**
@@ -25,10 +26,18 @@ import javafx.stage.Stage;
  */
 public class SongLibController {
 	
-	@FXML ListView<Song> listView;
-	@FXML Button add;
-	@FXML Button delete;
-	@FXML Button edit;
+	@FXML
+	private ListView<Song> listView;
+	@FXML
+	private TextArea songDetails;
+	@FXML
+	private TextField songName;
+	@FXML
+	private TextField songArtist;
+	@FXML
+	private TextField songAlbum;
+	@FXML
+	private TextField songYear;
 	
 	private ObservableList<Song> obsList;
 	

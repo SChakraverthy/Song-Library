@@ -17,7 +17,7 @@ public class SongLib extends Application {
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(getClass().getResource("/songlib/view/SongLib.fxml"));
-			BorderPane root = (BorderPane)loader.load();
+			GridPane root = (GridPane)loader.load();
 			
 			SongLibController controller = loader.getController();
 			
@@ -26,7 +26,7 @@ public class SongLib extends Application {
 			Scene scene = new Scene(root,800,600);
 			//scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			stage.setScene(scene);
-			//stage.setResizable(false);
+			stage.setResizable(false);
 			stage.setTitle("Song Library");
 			stage.show();
 		} catch(Exception e) {
