@@ -15,6 +15,8 @@ import org.xml.sax.SAXException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
@@ -51,7 +53,7 @@ public class SongLibController {
 	public void start(Stage stage) {
 		obsList = FXCollections.observableArrayList();
 		
-		//XML DOM
+		//Load the XML file into songData and populate obsList with that data
 		songData = loadSongData();
 		
 		listView.setItems(obsList);
@@ -65,6 +67,7 @@ public class SongLibController {
 		
 		if(!obsList.isEmpty())
 			showSongDetails();
+		
 	}
 	
 	private void showSongDetails() {
@@ -79,7 +82,7 @@ public class SongLibController {
 		songDetails.setText(s);
 	}
 	
-	private void clearText() {
+	private void clearInput() {
 		songName.clear();
 		songArtist.clear();
 		songAlbum.clear();
@@ -117,33 +120,26 @@ public class SongLibController {
 					song.setYear(Integer.valueOf(songYear.getText()));
 				else song.setYear(0);
 				if(!obsList.contains(song)) {
-					
 					obsList.add(song);
-					
+					saveSong(song);
 					//save to XML DOM
-					Element songXML = songData.createElement("song");
-					Element songNameXML = songData.createElement("Name");
-					Element songArtistXML = songData.createElement("Artist");
-					Element songAlbumXML = songData.createElement("Album");
-					Element songYearXML = songData.createElement("Year");
-					songNameXML.appendChild(songData.createTextNode(songName.getText()));
-					songArtistXML.appendChild(songData.createTextNode(songArtist.getText()));
-					songAlbumXML.appendChild(songData.createTextNode(songAlbum.getText()));
-					songYearXML.appendChild(songData.createTextNode(songYear.getText()));
-					songXML.appendChild(songNameXML);
-					songXML.appendChild(songArtistXML);
-					songXML.appendChild(songAlbumXML);
-					songXML.appendChild(songYearXML);
-					songData.getFirstChild().appendChild(songXML);
-					saveSongData();
+				} else {
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("Error");
+					alert.setHeaderText(null);
+					alert.setContentText("Song already exists. It will not be added.");
+					alert.showAndWait();
 				}
 				sortList();
-				clearText();
+				listView.requestFocus();
+				listView.getSelectionModel().select(song);
+				showSongDetails();
+				clearInput();
 			}
 		});
 		
 		cancel.setOnAction((event) -> {
-			clearText();
+			clearInput();
 		});
 	}
 	
@@ -158,6 +154,28 @@ public class SongLibController {
 	}
 	
 	/*
+	 * Saves the song to songData (XML DOM object). Then writes it to the xml file.
+	 */
+	private void saveSong(Song song) {
+		Element songXML = songData.createElement("song");
+		Element songNameXML = songData.createElement("Name");
+		Element songArtistXML = songData.createElement("Artist");
+		Element songAlbumXML = songData.createElement("Album");
+		Element songYearXML = songData.createElement("Year");
+		songNameXML.appendChild(songData.createTextNode(song.getName()));
+		songArtistXML.appendChild(songData.createTextNode(song.getArtist()));
+		songAlbumXML.appendChild(songData.createTextNode(song.getAlbum()));
+		songYearXML.appendChild(songData.createTextNode(String.valueOf(song.getYear())));
+		songXML.appendChild(songNameXML);
+		songXML.appendChild(songArtistXML);
+		songXML.appendChild(songAlbumXML);
+		songXML.appendChild(songYearXML);
+		songData.getFirstChild().appendChild(songXML);
+		
+		saveSongData();
+	}
+	
+	/*
 	 * Writes the data in songData to songlist.xml
 	 */
 	private void saveSongData() {
@@ -167,7 +185,6 @@ public class SongLibController {
 			Result output = new StreamResult(new File("src/songlib/resources/songlist.xml"));
 			Source input = new DOMSource(songData);
 			transformer.transform(input, output);
-			System.out.println("saving");
 		} catch (TransformerFactoryConfigurationError | TransformerException e) {
 			e.printStackTrace();
 		}
@@ -175,9 +192,9 @@ public class SongLibController {
 	}
 	
 	/**
-	 * Populates the obsList with songs from an XML file, and sorts it.
+	 * Populates obsList with songs from an XML file, and sorts it.
 	 * 
-	 * @return Document object containing song data.
+	 * @return XML Document object containing song data.
 	 */
 	private Document loadSongData() {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
