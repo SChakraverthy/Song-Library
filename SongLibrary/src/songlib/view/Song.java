@@ -26,16 +26,33 @@ public class Song {
 	
 	@Override
 	public int hashCode() {
-		return 31 * 7 + name.length();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((artist == null) ? 0 : artist.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if(o == null || !(o instanceof Song)) {
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
 			return false;
-		}
-		Song other = (Song)o;
-		return this.name == other.name && this.artist == other.artist;
+		if (getClass() != obj.getClass())
+			return false;
+		Song other = (Song) obj;
+		if (artist == null) {
+			if (other.artist != null)
+				return false;
+		} else if (!artist.equals(other.artist))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
 	}
 	
 	public void setName(String name) {
