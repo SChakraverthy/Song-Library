@@ -147,6 +147,80 @@ public class SongLibController {
 	@FXML
 	public void delete() {
 		
+		apply.setVisible(true);
+		cancel.setVisible(true);
+		
+		cancel.setOnAction((event)->{
+			clearInput();
+		});
+		
+		apply.setOnAction((event) -> {
+			
+			// Get the current song selection's details.
+			Song song = listView.getSelectionModel().getSelectedItem();
+			
+			String s_name = song.getName();
+			String s_artist = song.getArtist();
+				
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder;
+			Document document;
+			
+			try {
+				
+				builder = factory.newDocumentBuilder();
+				document = builder.parse(new File("src/songlib/resources/songlist.xml"));
+				document.getDocumentElement().normalize();
+
+				NodeList nList = document.getElementsByTagName("song");
+							
+				for(int i = 0; i < nList.getLength(); i++) {
+					Node node = nList.item(i);
+					if(node.getNodeType() == Node.ELEMENT_NODE) {
+						Element e = (Element) node;
+						
+						Element e_name = (Element) e.getElementsByTagName("Name").item(0);
+						Element e_artist = (Element) e.getElementsByTagName("Artist").item(0);
+						Element e_album = (Element) e.getElementsByTagName("Album").item(0);
+						Element e_year = (Element) e.getElementsByTagName("Year").item(0);
+						
+						if(s_name.equals(e_name.getTextContent()) && s_artist.equals(e_artist.getTextContent())) {
+							
+							// Found the Element want to delete. Delete the child nodes first, then the parent node.
+							Node parent = e.getParentNode();
+							e.removeChild(e_name);
+							e.removeChild(e_artist);
+							e.removeChild(e_album);
+							e.removeChild(e_year);
+							parent.removeChild(e);
+						}
+						
+					}
+				}
+				
+				// Save the changes to the xml file.
+				Transformer transformer;
+				try {
+					transformer = TransformerFactory.newInstance().newTransformer();
+					DOMSource source = new DOMSource(document);
+					StreamResult output = new StreamResult("src/songlib/resources/songlist.xml");
+					transformer.transform(source, output);
+				} catch (TransformerFactoryConfigurationError | TransformerException e) {
+					e.printStackTrace();
+				}
+					
+				obsList.remove(song);
+				showSongDetails();
+				sortList();
+			
+			} catch (ParserConfigurationException | SAXException | IOException e1) {
+				e1.printStackTrace();
+			}
+			
+			
+			
+		});
+		
 		return;
 	}
 	
@@ -356,4 +430,6 @@ private void updateSong(Song oldSongInfo, Song newSongInfo) {
 		}
 		return;
 	}
+
+	
 }
