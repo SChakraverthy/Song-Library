@@ -258,16 +258,13 @@ public class SongLibController {
 			
 			if(songAlbum.getText() != null && !songAlbum.getText().isEmpty()) {
 				newSongInfo.setAlbum(songAlbum.getText());
-			} else {
-				newSongInfo.setAlbum(song.getAlbum());;
-			}
+			} 
 			
 			if(songYear.getText() != null && !songYear.getText().isEmpty()) {
 				newSongInfo.setYear(Integer.valueOf(songYear.getText()));
 			} else {
-				newSongInfo.setYear(song.getYear());;
+				newSongInfo.setYear(0);
 			}
-			
 			
 			if(newSongInfo.equals(song)) {
 								
