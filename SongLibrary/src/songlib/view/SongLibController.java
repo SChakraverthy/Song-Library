@@ -73,14 +73,18 @@ public class SongLibController {
 	
 	private void showSongDetails() {
 		Song song = listView.getSelectionModel().getSelectedItem();
-		String s = "Name: " + song.getName() + "\nArtist: " + song.getArtist();
-		if(song.getAlbum() != null && !song.getAlbum().isEmpty()) {
-			s = s + "\nAlbum: " + song.getAlbum();
+		if(song == null) {
+			songDetails.clear();
+		} else {
+			String s = "Name: " + song.getName() + "\nArtist: " + song.getArtist();
+			if(song.getAlbum() != null && !song.getAlbum().isEmpty()) {
+				s = s + "\nAlbum: " + song.getAlbum();
+			}
+			if(song.getYear() != 0) {
+				s = s + "\nYear: " + song.getYear();
+			}
+			songDetails.setText(s);
 		}
-		if(song.getYear() != 0) {
-			s = s + "\nYear: " + song.getYear();
-		}
-		songDetails.setText(s);
 	}
 	
 	private void clearInput() {
@@ -97,7 +101,7 @@ public class SongLibController {
 	}
 	
 	private void sortList() {
-		Comparator<Song> comparator = Comparator.comparing(Song::getName);
+		Comparator<Song> comparator = Comparator.comparing(Song::toString);
 		obsList.sort(comparator);
 	}
 	
@@ -146,6 +150,10 @@ public class SongLibController {
 	
 	@FXML
 	public void delete() {
+		//Do nothing if there are no songs in list
+		if(listView.getSelectionModel().getSelectedIndex() < 0) {
+			return;
+		}
 		
 		apply.setVisible(true);
 		cancel.setVisible(true);
@@ -161,68 +169,38 @@ public class SongLibController {
 			
 			String s_name = song.getName();
 			String s_artist = song.getArtist();
-				
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder;
-			Document document;
 			
-			try {
-				
-				builder = factory.newDocumentBuilder();
-				document = builder.parse(new File("src/songlib/resources/songlist.xml"));
-				document.getDocumentElement().normalize();
-
-				NodeList nList = document.getElementsByTagName("song");
-							
-				for(int i = 0; i < nList.getLength(); i++) {
-					Node node = nList.item(i);
-					if(node.getNodeType() == Node.ELEMENT_NODE) {
-						Element e = (Element) node;
-						
-						Element e_name = (Element) e.getElementsByTagName("Name").item(0);
-						Element e_artist = (Element) e.getElementsByTagName("Artist").item(0);
-						Element e_album = (Element) e.getElementsByTagName("Album").item(0);
-						Element e_year = (Element) e.getElementsByTagName("Year").item(0);
-						
-						if(s_name.equals(e_name.getTextContent()) && s_artist.equals(e_artist.getTextContent())) {
-							
-							// Found the Element want to delete. Delete the child nodes first, then the parent node.
-							Node parent = e.getParentNode();
-							e.removeChild(e_name);
-							e.removeChild(e_artist);
-							e.removeChild(e_album);
-							e.removeChild(e_year);
-							parent.removeChild(e);
-						}
-						
-					}
-				}
-				
-				// Save the changes to the xml file.
-				Transformer transformer;
-				try {
-					transformer = TransformerFactory.newInstance().newTransformer();
-					DOMSource source = new DOMSource(document);
-					StreamResult output = new StreamResult("src/songlib/resources/songlist.xml");
-					transformer.transform(source, output);
-				} catch (TransformerFactoryConfigurationError | TransformerException e) {
-					e.printStackTrace();
-				}
+			Node root = songData.getDocumentElement();
+			NodeList nList = songData.getElementsByTagName("song");
+			
+			for(int i = 0; i < nList.getLength(); i++) {
+				Node node = nList.item(i);
+				if(node.getNodeType() == Node.ELEMENT_NODE) {
+					Element e = (Element) node;
 					
-				obsList.remove(song);
-				showSongDetails();
-				sortList();
-				clearInput();
-			
-			} catch (ParserConfigurationException | SAXException | IOException e1) {
-				e1.printStackTrace();
+					Element e_name = (Element) e.getElementsByTagName("Name").item(0);
+					Element e_artist = (Element) e.getElementsByTagName("Artist").item(0);
+					
+					if(s_name.equals(e_name.getTextContent()) && s_artist.equals(e_artist.getTextContent())) {
+						root.removeChild(e);
+					}
+					
+				}
 			}
-			
-			
+			// Save the changes to the xml file.
+			saveSongData();
+			if(obsList.indexOf(song) == obsList.size()-1) {
+				listView.getSelectionModel().selectPrevious();
+			} else {
+				listView.getSelectionModel().selectNext();
+			}
+			obsList.remove(song);
+			showSongDetails();
+			sortList();
+			clearInput();
+			listView.requestFocus();
 			
 		});
-		
-		return;
 	}
 	
 	@FXML
