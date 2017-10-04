@@ -260,28 +260,53 @@ public class SongLibController {
 		apply.setOnAction((event) -> {
 			
 			// Grab the changes made by the user and update the xml file with the changed details.
+			String song_name;
+			String song_artist;
 			
-			if((songName.getText() != null && !songName.getText().isEmpty()) && (songArtist.getText() != null && !songArtist.getText().isEmpty())) {
+			if(songName.getText() != null && !songName.getText().isEmpty()) {
+				song_name = songName.getText();
+			} else {
+				song_name = s_name;
+			}
+			
+			if(songArtist.getText() != null && !songArtist.getText().isEmpty()) {
+				song_artist = songArtist.getText();
+			} else {
+				song_artist = s_artist;
+			}
 				
-				Song newSongInfo = new Song(songName.getText(), songArtist.getText());
 				
-				if(songAlbum.getText() != null) {
-					newSongInfo.setAlbum(songAlbum.getText());
-				}
+			Song newSongInfo = new Song(song_name, song_artist);
+			
+			if(obsList.contains(newSongInfo)) {
 				
-				if(songYear.getText()!= null && !songYear.getText().isEmpty()) {
-					newSongInfo.setYear(Integer.valueOf(songYear.getText()));	
-				}
+				// Alert the user.
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("Error");
+				alert.setHeaderText(null);
+				alert.setContentText("Song already exists. It will not be edited.");
+				alert.showAndWait();
+				clearInput();
+				return;
 				
-				updateSong(song, newSongInfo);
-				
-				// Change the view on the observable list.
-				obsList.remove(song);
-				obsList.add(newSongInfo);
-				
-				listView.requestFocus();
-				listView.getSelectionModel().select(newSongInfo);
-			}			
+			}
+			
+			if(songAlbum.getText() != null) {
+				newSongInfo.setAlbum(songAlbum.getText());
+			}
+			
+			if(songYear.getText()!= null && !songYear.getText().isEmpty()) {
+				newSongInfo.setYear(Integer.valueOf(songYear.getText()));	
+			}
+			
+			updateSong(song, newSongInfo);
+			
+			// Change the view on the observable list.
+			obsList.remove(song);
+			obsList.add(newSongInfo);
+			
+			listView.requestFocus();
+			listView.getSelectionModel().select(newSongInfo);		
 			
 			sortList();
 			showSongDetails();
