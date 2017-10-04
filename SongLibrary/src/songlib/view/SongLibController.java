@@ -212,6 +212,7 @@ public class SongLibController {
 				obsList.remove(song);
 				showSongDetails();
 				sortList();
+				clearInput();
 			
 			} catch (ParserConfigurationException | SAXException | IOException e1) {
 				e1.printStackTrace();
