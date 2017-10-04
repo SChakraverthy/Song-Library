@@ -274,30 +274,52 @@ public class SongLibController {
 				song_artist = songArtist.getText();
 			} else {
 				song_artist = s_artist;
-			}
-				
-				
+			}			
+			
 			Song newSongInfo = new Song(song_name, song_artist);
 			
-			if(obsList.contains(newSongInfo)) {
-				
-				// Alert the user.
+			if(songAlbum.getText() != null && !songAlbum.getText().isEmpty()) {
+				newSongInfo.setAlbum(songAlbum.getText());
+			} else {
+				newSongInfo.setAlbum(song.getAlbum());;
+			}
+			
+			if(songYear.getText() != null && !songYear.getText().isEmpty()) {
+				newSongInfo.setYear(Integer.valueOf(songYear.getText()));
+			} else {
+				newSongInfo.setYear(song.getYear());;
+			}
+			
+			
+			if(newSongInfo.equals(song)) {
+								
+				if((newSongInfo.getAlbum() != null && song.getAlbum() != null) && (newSongInfo.getYear() != 0 && song.getYear() != 0)) {
+					
+					// Check to see if the information is the same.
+					if((newSongInfo.getAlbum()).equals(song.getAlbum()) && newSongInfo.getYear() == song.getYear()) {
+						
+						sortList();
+						showSongDetails();
+						clearInput();
+						return;
+						
+					}
+					
+				}
+			}
+			
+			if(!newSongInfo.equals(song) && obsList.contains(newSongInfo)) {
+			
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("Error");
 				alert.setHeaderText(null);
-				alert.setContentText("Song already exists. It will not be edited.");
+				alert.setContentText("Song already exists. Unable to edit.");
 				alert.showAndWait();
+
+				sortList();
+				showSongDetails();
 				clearInput();
 				return;
-				
-			}
-			
-			if(songAlbum.getText() != null) {
-				newSongInfo.setAlbum(songAlbum.getText());
-			}
-			
-			if(songYear.getText()!= null && !songYear.getText().isEmpty()) {
-				newSongInfo.setYear(Integer.valueOf(songYear.getText()));	
 			}
 			
 			updateSong(song, newSongInfo);
