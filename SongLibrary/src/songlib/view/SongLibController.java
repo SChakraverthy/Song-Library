@@ -121,9 +121,28 @@ public class SongLibController {
 				if(songAlbum.getText() != null && !songAlbum.getText().isEmpty())
 					song.setAlbum(songAlbum.getText());
 				else song.setAlbum("");
-				if(songYear.getText() != null && !songYear.getText().isEmpty())
-					song.setYear(Integer.valueOf(songYear.getText()));
-				else song.setYear(0);
+				if(songYear.getText() != null && !songYear.getText().isEmpty()) {
+					int year = 0;
+					try {
+						year = Integer.parseInt(songYear.getText());
+						song.setYear(year);
+					} catch(NumberFormatException e) {
+						Alert alert = new Alert(AlertType.INFORMATION);
+						alert.setTitle("Error");
+						alert.setHeaderText(null);
+						alert.setContentText("Invalid input for year. Song will not be added.");
+						alert.showAndWait();
+						sortList();
+						listView.requestFocus();
+						listView.getSelectionModel().select(song);
+						showSongDetails();
+						clearInput();
+						return;
+					}
+					//song.setYear(Integer.valueOf(songYear.getText()));
+				} else {
+					song.setYear(0);
+				}
 				if(!obsList.contains(song)) {
 					obsList.add(song);
 					saveSong(song);
@@ -150,6 +169,7 @@ public class SongLibController {
 	
 	@FXML
 	public void delete() {
+		clearInput();
 		//Do nothing if there are no songs in list
 		if(listView.getSelectionModel().getSelectedIndex() < 0) {
 			return;
@@ -261,7 +281,23 @@ public class SongLibController {
 			} 
 			
 			if(songYear.getText() != null && !songYear.getText().isEmpty()) {
-				newSongInfo.setYear(Integer.valueOf(songYear.getText()));
+				int year = 0;
+				try {
+					year = Integer.parseInt(songYear.getText());
+					newSongInfo.setYear(year);
+				} catch(NumberFormatException e) {
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("Error");
+					alert.setHeaderText(null);
+					alert.setContentText("Invalid input for year. Song will not be changed.");
+					alert.showAndWait();
+					sortList();
+					listView.requestFocus();
+					listView.getSelectionModel().select(song);
+					showSongDetails();
+					clearInput();
+					return;
+				}
 			} else {
 				newSongInfo.setYear(0);
 			}
