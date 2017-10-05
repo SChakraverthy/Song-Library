@@ -269,7 +269,6 @@ public class SongLibController {
 			if(newSongInfo.equals(song)) {
 								
 				if((newSongInfo.getAlbum() != null && song.getAlbum() != null) && (newSongInfo.getYear() != 0 && song.getYear() != 0)) {
-					
 					// Check to see if the information is the same.
 					if((newSongInfo.getAlbum()).equals(song.getAlbum()) && newSongInfo.getYear() == song.getYear()) {
 						
@@ -393,7 +392,7 @@ public class SongLibController {
 	/**
 	 * Parses the XML file to update the song data and save changes.
 	 **/
-private void updateSong(Song oldSongInfo, Song newSongInfo) {
+	private void updateSong(Song oldSongInfo, Song newSongInfo) {
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder;
@@ -416,21 +415,14 @@ private void updateSong(Song oldSongInfo, Song newSongInfo) {
 					Element e_album = (Element) e.getElementsByTagName("Album").item(0);
 					Element e_year = (Element) e.getElementsByTagName("Year").item(0);
 					
-					if((oldSongInfo.getName()).equals(e_name.getTextContent())){
-						e_name.setTextContent(newSongInfo.getName());						
-					}
-					
-					if((oldSongInfo.getArtist()).equals(e_artist.getTextContent())) {
+					if((oldSongInfo.getName()).equals(e_name.getTextContent()) && (oldSongInfo.getArtist()).equals(e_artist.getTextContent())){
+						e_name.setTextContent(newSongInfo.getName());
 						e_artist.setTextContent(newSongInfo.getArtist());
-					}
-					
-					if((oldSongInfo.getAlbum()).equals(e_album.getTextContent())) {
 						e_album.setTextContent(newSongInfo.getAlbum());
-					}
-					
-					if((String.valueOf(oldSongInfo.getYear())).equals(e_year.getTextContent())) {
 						e_year.setTextContent(String.valueOf(newSongInfo.getYear()));
-					}					
+						
+						break;
+					}
 					
 				}
 			}
